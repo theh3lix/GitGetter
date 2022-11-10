@@ -11,7 +11,9 @@ namespace GitHubInfoDownloader.Models
     public class Commit
     {
         [Key]
+        [MaxLength(1024)]
         public string sha { get; set; }
+        [MaxLength(250)]
         public string message { get; set; }
         public DateTime date { get; set; }
 
@@ -22,6 +24,7 @@ namespace GitHubInfoDownloader.Models
         public int committerId { get; set; }
         [ForeignKey("committerId")]
         public GitUser committer { get; set; }
+
     }
 
 }

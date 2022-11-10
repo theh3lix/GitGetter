@@ -6,24 +6,22 @@ namespace GitHubInfoDownloader
     public class Runner
     {
         private readonly IMainService _mainService;
-        private readonly IGitHubApiService _apiService;
-        public Runner(IMainService mainService, IGitHubApiService apiService)
+        public Runner(IMainService mainService)
         {
             _mainService = mainService;
-            _apiService = apiService;
         }
 
         public void Run()
         {
-            ShowHeader();
+            Helper.ShowHeader();
             //get input data from the user
             var username = Helper.AskForParameter("Github user name");
             var repo = Helper.AskForParameter("Github repo name");
             Console.WriteLine();
 
             //download commits based on input data
-            var result = _apiService.GetData($"repos/{username}/{repo}/commits").Result;
-            if(result == null)
+            var result = _mainService.GetCommits(username,repo).Result;
+            if(result == default)
                 return;
 
             //display downloaded commits in the console
@@ -40,14 +38,6 @@ namespace GitHubInfoDownloader
             {
                 Console.WriteLine("Not saving, okay");
             }
-        }
-
-        private void ShowHeader()
-        {
-            Console.WriteLine("--------------------------------------");
-            Console.WriteLine("-----GitHub Commit Info Downloader----");
-            Console.WriteLine("--------------------------------------");
-            Console.WriteLine();
         }
     }
 }

@@ -9,6 +9,6 @@ namespace GitHubInfoDownloader.Services.Interfaces
 {
     public interface IGitHubApiService
     {
-        Task<List<GitHubResponseModel>> GetData(string url);
+        Task<T> GetData<T>(string url);
     }
 }

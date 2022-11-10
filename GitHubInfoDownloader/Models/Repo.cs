@@ -12,6 +12,7 @@ namespace GitHubInfoDownloader.Models
     {
         [Key]
         public int repoId { get; set; }
+        [MaxLength(255)]
         public string name { get; set; }
 
         public int ownerId { get; set; }

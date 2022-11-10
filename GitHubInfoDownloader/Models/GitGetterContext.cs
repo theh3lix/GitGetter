@@ -17,7 +17,7 @@ namespace GitHubInfoDownloader.Models
 
         public DbSet<Commit> commits { get; set; }
         public DbSet<Repo> repos { get; set; }
-        public DbSet<GitUser> gitusers { get; set; }
+        public DbSet<GitUser> gitUsers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -26,7 +26,5 @@ namespace GitHubInfoDownloader.Models
                 optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=GitGetterDatabase;Trusted_Connection=True;");
             }
         }
-
     }
-
 }

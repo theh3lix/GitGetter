@@ -10,8 +10,10 @@ namespace GitHubInfoDownloader.Models
     public class GitUser
     {
         [Key]
-        public int gituserId { get; set; }
+        public int gitUserId { get; set; }
+        [MaxLength(39)]
         public string name { get; set; }
+        [MaxLength(320)]
         public string email { get; set; }
 
         public ICollection<Repo> repos { get; set; }

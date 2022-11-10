@@ -14,8 +14,10 @@ namespace GitHubInfoDownloader.Services.Implementation
     {
         private readonly string _baseUrl = "https://api.github.com/";
 
-        public async Task<List<GitHubResponseModel>> GetData(string url)
+        public async Task<T> GetData<T>(string url)
         {
+            if (string.IsNullOrEmpty(url))
+                return default(T);
             using (var client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true }) { BaseAddress = new Uri(_baseUrl) })
             {
                 client.DefaultRequestHeaders.Clear();
@@ -23,16 +25,16 @@ namespace GitHubInfoDownloader.Services.Implementation
                 client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.132 Safari/537.36");
 
                 var response = await client.GetAsync(url);
-                return await HandleResponse(response);
+                return await HandleResponse<T>(response);
             }
         }
 
-        private async Task<List<GitHubResponseModel>> HandleResponse(HttpResponseMessage response)
+        private async Task<T> HandleResponse<T>(HttpResponseMessage response)
         {
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var response_parsed = JsonConvert.DeserializeObject<List<GitHubResponseModel>>(content);
+                var response_parsed = JsonConvert.DeserializeObject<T>(content);
                 return response_parsed;
             }
             else
@@ -40,7 +42,7 @@ namespace GitHubInfoDownloader.Services.Implementation
                 var content = await response.Content.ReadAsStringAsync();
                 var error = JsonConvert.DeserializeObject<GitHubErrorModel>(content);
                 Console.WriteLine($"{((int)response.StatusCode)}: {error.message}");
-                return null;
+                return default(T);
             }
         }
     }

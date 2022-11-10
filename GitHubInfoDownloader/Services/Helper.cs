@@ -9,6 +9,13 @@ namespace GitHubInfoDownloader.Services
 {
     public class Helper
     {
+        public static void ShowHeader()
+        {
+            Console.WriteLine("--------------------------------------");
+            Console.WriteLine("-----GitHub Commit Info Downloader----");
+            Console.WriteLine("--------------------------------------");
+            Console.WriteLine();
+        }
         public static string AskForParameter(string parametername)
         {
             Console.WriteLine($"{parametername}: ");

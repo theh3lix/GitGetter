@@ -14,7 +14,7 @@ namespace GitHubInfoDownloader.Repositories.Implementation
 
         public GitUser GetUser(string username)
         {
-            return _dbContext.gitusers.FirstOrDefault(x => x.name == username);
+            return _dbContext.gitUsers.FirstOrDefault(x => x.name == username);
         }
 
     }

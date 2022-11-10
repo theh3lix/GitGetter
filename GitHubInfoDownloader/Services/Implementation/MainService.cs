@@ -6,17 +6,19 @@ namespace GitHubInfoDownloader.Services.Implementation
 {
     public class MainService : IMainService
     {
+        private readonly IGitHubApiService _gitHubApiService;
         private readonly ICommitRepository _commitRepository;
         private readonly IGitUserRepository _userRepository;
         private readonly IRepoRepository _repoRepository;
         private string _repoName;
         private string _ownerName;
 
-        public MainService(ICommitRepository commitRepository, IGitUserRepository userRepository, IRepoRepository repoRepository)
+        public MainService(ICommitRepository commitRepository, IGitUserRepository userRepository, IRepoRepository repoRepository, IGitHubApiService gitHubApiService)
         {
             _commitRepository = commitRepository;
             _userRepository = userRepository;
             _repoRepository = repoRepository;
+            _gitHubApiService = gitHubApiService;
         }
 
         public void SetService(string repoName, string ownerName)
@@ -25,24 +27,36 @@ namespace GitHubInfoDownloader.Services.Implementation
             _ownerName = ownerName;
         }
 
+        public async Task<List<GitHubResponseModel>> GetCommits(string username, string repo)
+        {
+            return await _gitHubApiService.GetData<List<GitHubResponseModel>>($"repos/{username}/{repo}/commits");
+        }
+
         public async Task<int> SaveRecords(List<GitHubResponseModel> records)
         {
             int cnt = 0;
             foreach(var record in records)
             {
-                if (_commitRepository.Exists(record.sha))
-                    continue;
-                var toAdd = BuildCommit(record);
-                try
-                {
-                    _commitRepository.Add(toAdd);
-                    cnt++;
-                }catch(Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
+                if (await SaveRecordAsync(record)) cnt++;
             }
             return cnt;
+        }
+
+        private async Task<bool> SaveRecordAsync(GitHubResponseModel record)
+        {
+            if (_commitRepository.Exists(record.sha))
+                return false;
+            var toAdd = BuildCommit(record);
+            try
+            {
+                await _commitRepository.AddAsync(toAdd);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
         }
 
         private Commit BuildCommit(GitHubResponseModel record)
@@ -79,7 +93,7 @@ namespace GitHubInfoDownloader.Services.Implementation
 
         private Repo BuildRepo(GitUser owner)
         {
-            var repo = _repoRepository.GetRepo(_repoName, owner.gituserId);
+            var repo = _repoRepository.GetRepo(_repoName, owner.gitUserId);
             if (repo == null)
             {
                 repo = new Repo
@@ -98,7 +112,7 @@ namespace GitHubInfoDownloader.Services.Implementation
             {
                 owner = new GitUser
                 {
-                    gituserId = 0,
+                    gitUserId = 0,
                     name = _ownerName
                 };
             }
